@@ -16,7 +16,7 @@ device = 'cpu'
 # Load model architecture and parameters
 path = Path() 
 
-checkpoint_path = "models/BEST_checkpoint_Vocab_5_cap_per_img_2_min_word_freq_withoutFineTuning.pth.tar"
+checkpoint_path = "models/Best_model.pth"
 
 # Vocab dict loading  
 vocab = json.load((path/"static/Vocab_5_cap_per_img_2_min_word_freq.json").open('rb'))

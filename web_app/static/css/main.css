@@ -37,7 +37,8 @@ input[type="file"] {
 
 .upload-label:hover{
     background: #34495E;
-    color: #39D2B4;
+    color: mediumspringgreen;
+    font-weight: bold;
 }
 
 .loader {
