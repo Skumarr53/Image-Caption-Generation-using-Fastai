@@ -4,8 +4,8 @@
 
 ## Requirements
 - **Dataset** - [Flicker8k]('https://www.kaggle.com/ming666/flicker8k-dataset') or any dataset of your choice
-- **Modules** - Pytorch, NumPy, Pandas, nltk, etc.
-- **Concepts** - Encoder-Decoder, resnet pre-trained model, Attention, Transfer learning, Bleu4, Beam Search.
+- **Modules** - Pytorch, NumPy, Pandas, Nltk, etc.
+- **Concepts** - Encoder-Decoder, Resnet pre-trained model, Attention, Transfer learning, Bleu4, Beam Search.
 - Pretrained word embeddings (optional) - training much faster with pre-trained word embeddings. 
 
 
@@ -36,15 +36,15 @@ It is always a good idea to sort by order of captions length for faster computat
 
 
 ### Create Pad_collete function
-Since the captions lengths are of different lengths, padding should be added for shorter captions to bring them to common shape as pytorch expects caption lengths to be of the same size. 
+Since the captions lengths are of different lengths, padding should be added for shorter captions to bring them to common shape as PyTorch expects caption lengths to be of the same size. 
 
 Funtion collect samples and return labels tensor with padding. This funtion is passed as an argment( ```collate_fn``` ) while creating ```DataLoader``` object.
 
 ## 3. **Model architecture**
-The network architecture consists of three components i.e encoder, Attention and decoder. 
+The network architecture consists of three components i.e encoder, Attention, and decoder. 
 
 ### Encoder
-The encoder is a convolution neural network takes in raw images as input and outputs extracted features as encoded images.  The extractor produces **L** (no of output convolution layers) vectors each of **D**-dimension (no of pixels) corresponds to part of the image thus indicates **L** different features at different locations have been identified.
+The encoder is a convolution neural network that takes in raw images as input and outputs extracted features as encoded images. The extractor produces **L** (no of output convolution layers) vectors each of **D**-dimension (no of pixels) corresponds to part of the image thus indicates **L** different features at different locations have been identified.
 
 .
 
@@ -88,7 +88,7 @@ Atten of **a** lets call the transformation function **Z(t)** where **t** curren
 
 2. hidden encoder taken dot product across image pixels producing attention activation layer (14, 14). The hidden encoder decides where to put the focus on the image to generate words based on previously generated words.
 
-3. Now we use this attention layer to compute weighted sum across the pixels dimension of encoder output tensor producing a vector of size (512) encodes what is interesting for it. This vector is called an attention weighted hidden state.
+3. Now we use this attention layer to compute weighted sum across the pixels dimension of encoder output tensor producing a vector of size (512) encodes what is interesting for it. This vector is called attention weighted hidden state.
 
 4. Sigmoid scores, computed on these Attention weighted hidden state, has to be multiplied to the Decoder hidden state before passing into Decoder network to generate the next word.
 
@@ -112,12 +112,12 @@ Training decoder from scratch requires a lot of computation hence more time. Ins
 ### Training (Fastai Implementation)
 * **lr _finder** - It will do a mock training by going over a large range of learning rates, then plot them against the losses. We will pick a value a bit before the minimum, where the loss still improves.
 
-* **fit_one_cycle** - Method is implementation of one cycle policy. lr goes up to max and comes down for one cycle of passing through all mini batches. In one fit cycle takes entire input and divides into batches of size 'bs'. then start with lr_min for the first batch increase gradually for next batches and when batch number reaches 30 percent of total batches, lr reaches lr_max and then starts going down and reaches lr_min again at last batch.
+* **fit_one_cycle** - Method is implementation of one cycle policy. lr goes up to max and comes down for one cycle of passing through all mini-batches. In one fit cycle takes entire input and divides into batches of size 'bs'. then start with lr_min for the first batch increase gradually for next batches and when the batch number reaches 30 percent of total batches, lr reaches lr_max and then starts going down and reaches lr_min again at last batch.
 
     The original 1cycle policy has three steps:
 
-    1. We progressively increase our learning rate from lr_max/div_factor to lr_max and at the same time we progressively decrease our momentum from mom_max to mom_min.
-    2. We do the exact opposite: we progressively decrease our learning rate from lr_max to lr_max/div_factor and at the same time we progressively increase our momentum from mom_min to mom_max.
+    1. We progressively increase our learning rate from lr_max/div_factor to lr_max and at the same time, we progressively decrease our momentum from mom_max to mom_min.
+    2. We do the exact opposite: we progressively decrease our learning rate from lr_max to lr_max/div_factor and at the same time, we progressively increase our momentum from mom_min to mom_max.
     3. We further decrease our learning rate from lr_max/div_factor to lr_max/(div_factor x 100) and we keep momentum steady at mom_max.
 
 
@@ -130,20 +130,20 @@ Training imp points:
 ### Callback Utilities:
 
 **Teacher forcing** 
-* teacher forcing is whispering actual word as input into decoder instead of previous predict word. with randomness of one two 
+* teacher forcing is whispering actual word as input into decoder instead of previous predict word with some randomness
 
 **Clipping gradients**:
-*  Gradients can vanish because they they are continuously multiplied by numbers less than one. This is called the vanishing gradient problem.
+*  Gradients can vanish because they are continuously multiplied by numbers less than one. This is called the vanishing gradient problem.
 
 * It has little effect on learning, but if you have a "bad minibatch" that would cause gradients to explode for some reason, the clipping prevents that iteration from messing up your entire model.
 
 **Early Stopping**
 
-* The authors of *Show, Attend and Tell paper* observe that correlation between the loss and the BLEU score breaks down after a point, so they recommend to stop training early on when the BLEU score strats degrading or stops improving.
+* The authors of *Show, Attend and Tell paper* observe that correlation between the loss and the BLEU score breaks down after a point, so they recommend to stop training early on when the BLEU score starts degrading or stops improving.
 
 ### Training in Stages
 
-In first stage, model is trained with encoder part freezed i.e only decoder weights allowed to be updated for faster training. Model was run with batch of ```25``` images for 12 epoches using ```Adam()``` optimizer with  learning rate of ```4e-04```
+In the first stage, the model is trained with encoder part froze i.e only decoder weights allowed to be updated for faster training. The model was run with a batch of ```25``` images for 12 epochs using ```Adam()``` optimizer with a learning rate of ```4e-04```
 
 **Results**:
 epoch | train_loss | valid_loss | topK_accuracy | bleu_metric | time
@@ -164,7 +164,7 @@ epoch | train_loss | valid_loss | topK_accuracy | bleu_metric | time
 ![](snapshots/loss_stage1.png)
 
 
-In the second stage, model is trained with encoder part unfreezed condition. Model was run with batch of ```5``` images for 10 epoches using ```Adam()``` optimizer with ```1e-04``` learning rate adopting  ```one cycle policy``
+In the second stage, the model is trained with the encoder part unfrozen condition. The model was run with batch of ```5``` images for 10 epochs using ```Adam()``` optimizer with ```1e-04``` learning rate adopting  ```one cycle policy``
 
 **Results**:
 
@@ -186,7 +186,7 @@ epoch | train_loss | valid_loss | topK_accuracy | bleu_metric | time
 
 **Evaluation Beam search**
 
-**Beam search**: Involves selecting words with top ```k```(beam width) scores rather than a word with best score at each step. Beam Search is useful for any language modeling problem because it finds the most optimal sequence.
+**Beam search**: Involves selecting words with top ```k```(beam width) scores rather than a word with the best score at each step. Beam Search is useful for any language modeling problem because it finds the most optimal sequence.
 
 ![](snapshots/eval.jpeg)
 
@@ -196,3 +196,12 @@ epoch | train_loss | valid_loss | topK_accuracy | bleu_metric | time
 ``` python
 torch.save('bestmodel_stage2.pkl')
 ```
+
+
+External links:
+
+1. [Show, Attend and Tell - paper (arxiv)](https://arxiv.org/abs/1502.03044)
+
+2. [Illustrated Guide to LSTM's and GRU's - Medium](https://towardsdatascience.com/illustrated-guide-to-lstms-and-gru-s-a-step-by-step-explanation-44e9eb85bf21) 
+
+2. [a-PyTorch-Tutorial-to-Image-Captioning - GitHub](https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Image-Captioning)
