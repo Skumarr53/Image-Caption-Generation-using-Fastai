@@ -1,12 +1,12 @@
 # Image captioning: Implementation of ***Show, Attend and Tell*** paper
 
+[[TOC]]
+
+## Demo
 ![](snapshots/caption_gen.gif)
 
-## Requirements
-- **Dataset** - [Flicker8k]('https://www.kaggle.com/ming666/flicker8k-dataset') or any dataset of your choice
-- **Modules** - Pytorch, NumPy, Pandas, Nltk, etc.
-- **Concepts** - Encoder-Decoder, Resnet pre-trained model, Attention, Transfer learning, Bleu4, Beam Search.
-- Pretrained word embeddings (optional) - training much faster with pre-trained word embeddings. 
+
+## 
 
 
 ## 1. **Input files preparation**
@@ -17,80 +17,46 @@ There are Multiple captions available for each image. however, for simplicity, I
 
 ### preparation of vocabulary dictionary.
 
-It is necessary to convert the captions into numbers as a network does not accept strings as labels. we need to create a look-up dictionary that maps between word and index. All the caption labels are tokenized and a number is assigned for each unique word known as **numericalization**. 
+The caption labels needs to be converted into numbers as a network does not accept strings as labels. we need a look-up dictionary and store word to numeric mappings in it. 
 
 Along with it, caption lengths are also computed. Caption lengths are used for optimizing training (discussed in detail in the training part).
 
 
 ### Create Dataset class
- In PyTorch, for Deep learning tasks, inputs are fed in batches because of memory constraints. To facilitate this we need to create a class called **Dataset** that helps us in creating and loading batches.
 
-The primary function of Dataset is stores the input paths and loads them when indexed 
- This class will be used by Pytorch's *DataLoader()* for loading batches.
+In PyTorch, for Deep learning tasks, inputs are fed in batches because of memory constraints. To facilitate this we should create a class called **Dataset** that facilitates batch creation and loading.
+
+The primary function of Dataset is stores the input paths. This class will be used by Pytorch's *DataLoader()* for loading images in batches.
 
 ### Create Dataloader object
 
-The purpose of the **Dataloader** is to load a batch of inputs and labels to be fed into the network.
+The purpose of the **Dataloader** is to load a batch of inputs and labels pairs to be fed into the network.
 
-It is always a good idea to sort by order of captions length for faster computation. On validation set, **SortSampler** from *Fastai* is used which is built on top of PyTorch's **Sampler**. On the training set, **SortishSampler** that sorts data by order of length with a bit of randomness is used. The sampler return iterator of indices.
+It is always a good idea to sort by order of captions length for faster computation. On validation set, **SortSampler** funtion from *Fastai* is used which is built on top of PyTorch's **Sampler**. On the training set, **SortishSampler** that sorts data by order of length with a bit of randomness is used. The sampler return iterator of indices.
 
 
 ### Create Pad_collete function
-Since the captions lengths are of different lengths, padding should be added for shorter captions to bring them to common shape as PyTorch expects caption lengths to be of the same size. 
+Since the captions lengths are of different lengths, padding should be added for shorter captions to bring them to same length as PyTorch expects caption lengths to be of the same size. 
 
 Funtion collect samples and return labels tensor with padding. This funtion is passed as an argment( ```collate_fn``` ) while creating ```DataLoader``` object.
 
-## 3. **Model architecture**
+## **Model architecture**
+
 The network architecture consists of three components i.e encoder, Attention, and decoder. 
 
 ### Encoder
+
 The encoder is a convolution neural network that takes in raw images as input and outputs extracted features as encoded images. The extractor produces **L** (no of output convolution layers) vectors each of **D**-dimension (no of pixels) corresponds to part of the image thus indicates **L** different features at different locations have been identified.
 
-.
+### Attention Layer
 
-## Attention Model
-
-The attention model generates attention weights at each step based on hidden state (**h[t-i]**) it received from decoder output at the previous step. 
-
-![](snapshots/encoded_image_vec.png)
-
-each **a** is weight vectors focus on different parts of the image thus at weights concentrated at different locations.
-
-Notice that **Z(t)** and **h(t-1)** should be of the same size as both going be combined (through one to one mapping functions) while in Attention and decoding process but original size doesn't match as both come from different sources so we have to use Linearlayer to reduce to a common size.
-
-for each location **i**, mechanism **Z(t)** generates a positive weights **α(i)** which is probabilty number that tells amount of focus to put on that part (**i**)  for generating **t** word in the caption (*hard attention*) or as relative importance to give to **i** location blend **a(i)**'s together in different proportion **α(i)**'s (*soft attention*).
-
-Attention is a multi-layer perceptron conditioned on previous hidden state **h(t-1)**  that encodes the sequence of words already predicted by decoder LSTM.
-
-![](snapshots/attention_and_alpha_scores.png)
-
-
-
-**α(ti)** defines attention given to each of **i** locations at time step **t** and **h(t-1)** encodes context till **t-1** steps tell not to give much focus on a location that has already read previously to avoid repetition of words in the caption.
-
-Once the weights are computed context vector **z(t)** is computed by
-![](snapshots/Z_t.png)
-
-**Z(t)** transformation function outputs vector that forms one of the inputs into the decoder.
-
-This **Z(t)** is different for Hard and Soft attention. I won't touch Mathematics behind them here. However, interested readers can refer to *section 4* in the [paper](https://arxiv.org/pdf/1502.03044.pdf). I have implemented soft attention.
+The attention model generates attention weights at each step based on previous step (**h[t-1]**) hidden state vector it receives from decoder. Hidden state carries information about context the caption that has been generated so far.  
 
 ### Decoder
 
-The decoder is the one that generates captions has LSTM network architecture. The decoder takes previous step attention weighted hidden state which is an improvised version of decoder hidden state 
-**h(t-1)** telling which part of the image to focus on to generate the next word.
+The decoder is the one that generates captions (one word at a step) has LSTM network architecture. The decoder takes attention weighted hidden state which is an improvised version of decoder hidden state at step **t-1** that tells which part of the image to focus, to generate the next word.
 
-Atten of **a** lets call the transformation function **Z(t)** where **t** current step indication transformation is different at every time step and word embedding matrix **E** which forms vocabulary for caption generation. 
 
-### Zoom into Attention part.
-
-1. Encoder outputs tensor of size batch size, image size, image size, encoder dim (1, 14, 14, 2048). Since decoder **hidden state** is of size decoder_dim (512). we have to reduce them to common size using a fully connected layer to (1, 14,14, 512). 
-
-2. hidden encoder taken dot product across image pixels producing attention activation layer (14, 14). The hidden encoder decides where to put the focus on the image to generate words based on previously generated words.
-
-3. Now we use this attention layer to compute weighted sum across the pixels dimension of encoder output tensor producing a vector of size (512) encodes what is interesting for it. This vector is called attention weighted hidden state.
-
-4. Sigmoid scores, computed on these Attention weighted hidden state, has to be multiplied to the Decoder hidden state before passing into Decoder network to generate the next word.
 
 The flow is depicted in the following image:
 ![](snapshots/model.png)
@@ -103,14 +69,17 @@ For the encoder part, I have used **Resnet-101** architecture trained on **Image
 
 There is an option to turn off encoder  fine_tuning, This sets ```requires_grad``` attribute of Encoder parameters to false.
 
-Note: for the Encoder, As we are using pre-trained weights trained on the Imagenet dataset consisting of images of 1000's of different objects which most likely includes objects found in our dataset. Therefore, the network doesn't need much tuning. On the other hand, the decoder has to learn a lot as it starts language modeling from scratch.
+Note: for the Encoder, As we are using pre-trained weights trained on the Imagenet dataset consisting of images of 1000's of different objects which most likely includes objects found in our dataset. Therefore, the network need not require much of tuning. On the other hand, the decoder has to learn a lot as it starts language modeling from scratch.
 
-It is better to train just decoder part (fine_tune off) for the first few epochs until we bring both of them to the same level then train the entire network for the next few epochs. In this way, we can save computational time involved in encoder's gradient computation when the decoder takes most of it in the initial few epochs.
+It is better to train just decoder part (fine_tune off) for the first few epochs until we bring both of them to the same level then train the entire network for the next few epochs. In this way, we can save computational time involved in encoder's gradient computation while the decoder takes most of the updation in the initial few epochs.
 
 Training decoder from scratch requires a lot of computation hence more time. Instead, we can use pre-trained word embeddings (word represent as a numeric vector) to train embedding layer output of which is passed into decoder along with the previous hidden state.
 
 ### Training (Fastai Implementation)
+
 * **lr _finder** - It will do a mock training by going over a large range of learning rates, then plot them against the losses. We will pick a value a bit before the minimum, where the loss still improves.
+
+![](snapshots/lr_find.png)
 
 * **fit_one_cycle** - Method is implementation of one cycle policy. lr goes up to max and comes down for one cycle of passing through all mini-batches. In one fit cycle takes entire input and divides into batches of size 'bs'. then start with lr_min for the first batch increase gradually for next batches and when the batch number reaches 30 percent of total batches, lr reaches lr_max and then starts going down and reaches lr_min again at last batch.
 
@@ -119,13 +88,6 @@ Training decoder from scratch requires a lot of computation hence more time. Ins
     1. We progressively increase our learning rate from lr_max/div_factor to lr_max and at the same time, we progressively decrease our momentum from mom_max to mom_min.
     2. We do the exact opposite: we progressively decrease our learning rate from lr_max to lr_max/div_factor and at the same time, we progressively increase our momentum from mom_min to mom_max.
     3. We further decrease our learning rate from lr_max/div_factor to lr_max/(div_factor x 100) and we keep momentum steady at mom_max.
-
-
-Training imp points:
-1. Note that there is considerable criticism of the BLEU score because it doesn't always correlate well with human judgment. The authors also report the METEOR scores for this reason, but I haven't implemented this metric.
-
-2. Instead of training word embedding layer from scratch a widely used *Glove* pre-trained word embedding was used for faster training and also a Language model trained on Wikipedia called *wiki-103* as a starting point for Decoder training.
-
 
 ### Callback Utilities:
 
@@ -191,14 +153,18 @@ epoch | train_loss | valid_loss | topK_accuracy | bleu_metric | time
 ![](snapshots/eval.jpeg)
 
 
-### Export Model
+## Technology used
 
-``` python
-torch.save('bestmodel_stage2.pkl')
-```
+![](https://forthebadge.com/images/badges/made-with-python.svg)
+
+[<img target="_blank" src="https://www.clipartmax.com/png/middle/322-3225839_tnt-pytorch-machine-learning-logo.png" width=250>](https://pytorch.org/)
+[<img target="_blank" src="https://buzz-prod-photos.global.ssl.fastly.net/img/87a50dce-a64d-4747-b152-30f2f13e80ef" width=150>](https://www.fast.ai/)
+[<img target="_blank" src="https://flask.palletsprojects.com/en/1.1.x/_images/flask-logo.png" width=202>](https://flask.palletsprojects.com/en/1.1.x/) 
+[<img target="_blank" src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/61/HTML5_logo_and_wordmark.svg/120px-HTML5_logo_and_wordmark.svg.png" width=100>]()
+[<img target="_blank" src="https://openjsf.org/wp-content/uploads/sites/84/2019/10/jquery-logo-vertical_large_square.png" width=100>](https://jquery.com/)
 
 
-External links:
+**External links:**
 
 1. [Show, Attend and Tell - paper (arxiv)](https://arxiv.org/abs/1502.03044)
 
