@@ -1,46 +1,65 @@
-# Image captioning: Implementation of ***Show, Attend and Tell*** paper
+# Image captioning: Implementation of **Show, Attend and Tell** paper
 
-[[TOC]]
+- [Image captioning: Implementation of **Show, Attend and Tell** paper](#image-captioning-implementation-of-show-attend-and-tell-paper)
+  - [Demo](#demo)
+  - [Dataset Description](#dataset-description)
+  - [Input files preparation](#input-files-preparation)
+    - [1. preparation of vocabulary dictionary.](#1-preparation-of-vocabulary-dictionary)
+    - [2. Create Dataset class](#2-create-dataset-class)
+    - [3. Create Dataloader object](#3-create-dataloader-object)
+    - [4. Create Pad_collete function](#4-create-pad_collete-function)
+  - [Model architecture](#model-architecture)
+    - [Encoder](#encoder)
+    - [Attention Layer](#attention-layer)
+    - [Decoder](#decoder)
+      - [Model architecture dimensions](#model-architecture-dimensions)
+  - [Training (Fastai Implementation)](#training-fastai-implementation)
+    - [Fastai utilities](#fastai-utilities)
+    - [Training in Stages](#training-in-stages)
+    - [Model intrpretation](#model-intrpretation)
+  - [Technology used](#technology-used)
+
 
 ## Demo
 ![](snapshots/caption_gen.gif)
 
 
-## 
+## Dataset Description
+
+https://www.kaggle.com/ming666/flicker8k-dataset
+
+**Flickr8k** Dataset consisting of around 8,000 images that are each paired with five different captions which provide clear descriptions of the salient entities and events. The images were chosen from six different Flickr groups, and tend not to contain any well-known people or locations, but were manually selected to depict a variety of scenes and situations. 6000 are used for training, 1000 for test and 1000 for development.
 
 
-## 1. **Input files preparation**
 
-The input data consists of a collection of raw images and metadata that has caption labels for every image in *JSON* format.
+## Input files preparation
 
-There are Multiple captions available for each image. however, for simplicity, I have considered up to 5 captions for each image.
-
-### preparation of vocabulary dictionary.
+### 1. preparation of vocabulary dictionary.
 
 The caption labels needs to be converted into numbers as a network does not accept strings as labels. we need a look-up dictionary and store word to numeric mappings in it. 
 
 Along with it, caption lengths are also computed. Caption lengths are used for optimizing training (discussed in detail in the training part).
 
 
-### Create Dataset class
+### 2. Create Dataset class
 
 In PyTorch, for Deep learning tasks, inputs are fed in batches because of memory constraints. To facilitate this we should create a class called **Dataset** that facilitates batch creation and loading.
 
 The primary function of Dataset is stores the input paths. This class will be used by Pytorch's *DataLoader()* for loading images in batches.
 
-### Create Dataloader object
+### 3. Create Dataloader object
 
 The purpose of the **Dataloader** is to load a batch of inputs and labels pairs to be fed into the network.
 
 It is always a good idea to sort by order of captions length for faster computation. On validation set, **SortSampler** funtion from *Fastai* is used which is built on top of PyTorch's **Sampler**. On the training set, **SortishSampler** that sorts data by order of length with a bit of randomness is used. The sampler return iterator of indices.
 
 
-### Create Pad_collete function
+### 4. Create Pad_collete function
 Since the captions lengths are of different lengths, padding should be added for shorter captions to bring them to same length as PyTorch expects caption lengths to be of the same size. 
 
 Funtion collect samples and return labels tensor with padding. This funtion is passed as an argment( ```collate_fn``` ) while creating ```DataLoader``` object.
 
-## **Model architecture**
+## Model architecture
 
 The network architecture consists of three components i.e encoder, Attention, and decoder. 
 
@@ -48,34 +67,41 @@ The network architecture consists of three components i.e encoder, Attention, an
 
 The encoder is a convolution neural network that takes in raw images as input and outputs extracted features as encoded images. The extractor produces **L** (no of output convolution layers) vectors each of **D**-dimension (no of pixels) corresponds to part of the image thus indicates **L** different features at different locations have been identified.
 
+For the encoder part, I have used **Resnet-101** architecture pre-trained on **Imagenet**. Since Resnet is trained for classifying different objects last Linear layer outputs 1-d prbability tensor. But, our objective is to get feature images so we have to retain only convolution layers and drop the last feed-forward layers.
+
 ### Attention Layer
 
-The attention model generates attention weights at each step based on previous step (**h[t-1]**) hidden state vector it receives from decoder. Hidden state carries information about context the caption that has been generated so far.  
+The attention model generates attention weights at every step based on previous step (**h[t-1]**) hidden state vector it receives from decoder. Hidden state carries information about context the caption that has been generated so far.  
 
 ### Decoder
 
-The decoder is the one that generates captions (one word at a step) has LSTM network architecture. The decoder takes attention weighted hidden state which is an improvised version of decoder hidden state at step **t-1** that tells which part of the image to focus, to generate the next word.
-
-
+The decoder is the one that generates captions (one word at a step) has LSTM network architecture. The decoder takes attention weighted hidden state which is an improvised version of decoder hidden state at step **t-1** that tells which part of the image should be focused to generate the next word.
 
 The flow is depicted in the following image:
 ![](snapshots/model.png)
 
-## Model Building
+#### Model architecture dimensions
+```py
+embedding input dimension = 300 
+attention dimension = 512
+decoder dimension = 512
+decoder dropout = 0.5
+encoder output dimension = 2048
+```
 
-### initialize model
 
-For the encoder part, I have used **Resnet-101** architecture trained on **Imagenet**. Since the resent was built for classifying different objects final layer outputs 1-d tensor. But, our objective is to get feature images so we have to retain only convolution layers and drop the last feed-forward layers. 
+## Training (Fastai Implementation)
 
-There is an option to turn off encoder  fine_tuning, This sets ```requires_grad``` attribute of Encoder parameters to false.
+As we are using pre-trained weights for the encoder which has been trained on the Imagenet dataset consisting of images of 1000's of different objects, that most likely includes objects found in our dataset. Therefore, the network need not require much of tuning. On the other hand, the decoder has to learn a lot as it starts language modeling from scratch.
 
-Note: for the Encoder, As we are using pre-trained weights trained on the Imagenet dataset consisting of images of 1000's of different objects which most likely includes objects found in our dataset. Therefore, the network need not require much of tuning. On the other hand, the decoder has to learn a lot as it starts language modeling from scratch.
-
-It is better to train just decoder part (fine_tune off) for the first few epochs until we bring both of them to the same level then train the entire network for the next few epochs. In this way, we can save computational time involved in encoder's gradient computation while the decoder takes most of the updation in the initial few epochs.
+So, it is better to train just decoder part (fine_tune off) for the first few epochs until we bring both of them to the same level then train the entire network for the next few epochs. In this way, we can save computational time involved in encoder's gradient computation while the decoder takes most of the updation in the initial few epochs.
 
 Training decoder from scratch requires a lot of computation hence more time. Instead, we can use pre-trained word embeddings (word represent as a numeric vector) to train embedding layer output of which is passed into decoder along with the previous hidden state.
 
-### Training (Fastai Implementation)
+
+### Fastai utilities
+
+Fastai is deep learning framework built on top of PyTorch with implementation of variuos state of the art methods. It provides a smooth API making it easier for most important deep learning applications. 
 
 * **lr _finder** - It will do a mock training by going over a large range of learning rates, then plot them against the losses. We will pick a value a bit before the minimum, where the loss still improves.
 
@@ -89,10 +115,6 @@ Training decoder from scratch requires a lot of computation hence more time. Ins
     2. We do the exact opposite: we progressively decrease our learning rate from lr_max to lr_max/div_factor and at the same time, we progressively increase our momentum from mom_min to mom_max.
     3. We further decrease our learning rate from lr_max/div_factor to lr_max/(div_factor x 100) and we keep momentum steady at mom_max.
 
-### Callback Utilities:
-
-**Teacher forcing** 
-* teacher forcing is whispering actual word as input into decoder instead of previous predict word with some randomness
 
 **Clipping gradients**:
 *  Gradients can vanish because they are continuously multiplied by numbers less than one. This is called the vanishing gradient problem.
@@ -150,6 +172,19 @@ epoch | train_loss | valid_loss | topK_accuracy | bleu_metric | time
 
 **Beam search**: Involves selecting words with top ```k```(beam width) scores rather than a word with the best score at each step. Beam Search is useful for any language modeling problem because it finds the most optimal sequence.
 
+![](snapshots/beam_search.png)
+
+**Validation results**
+
+Beam Size | Test BLEU-4
+----------|-------------
+1 |  21.8
+3 |  23.46
+5 |  23.9
+
+
+### Model intrpretation
+
 ![](snapshots/eval.jpeg)
 
 
@@ -164,7 +199,8 @@ epoch | train_loss | valid_loss | topK_accuracy | bleu_metric | time
 [<img target="_blank" src="https://openjsf.org/wp-content/uploads/sites/84/2019/10/jquery-logo-vertical_large_square.png" width=100>](https://jquery.com/)
 
 
-**External links:**
+
+**Credits:**
 
 1. [Show, Attend and Tell - paper (arxiv)](https://arxiv.org/abs/1502.03044)
 
