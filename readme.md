@@ -18,6 +18,8 @@
     - [Training in Stages](#training-in-stages)
     - [Model intrpretation](#model-intrpretation)
   - [Technology used](#technology-used)
+  - [Credits:](#credits)
+  - [Creator:](#creator)
 
 
 ## Demo
@@ -174,6 +176,8 @@ epoch | train_loss | valid_loss | topK_accuracy | bleu_metric | time
 
 ![](snapshots/beam_search.png)
 
+</br>
+
 **Validation results**
 
 Beam Size | Test BLEU-4
@@ -199,11 +203,18 @@ Beam Size | Test BLEU-4
 [<img target="_blank" src="https://openjsf.org/wp-content/uploads/sites/84/2019/10/jquery-logo-vertical_large_square.png" width=100>](https://jquery.com/)
 
 
+</br>
 
-**Credits:**
+## Credits:
 
 1. [Show, Attend and Tell - paper (arxiv)](https://arxiv.org/abs/1502.03044)
 
 2. [Illustrated Guide to LSTM's and GRU's - Medium](https://towardsdatascience.com/illustrated-guide-to-lstms-and-gru-s-a-step-by-step-explanation-44e9eb85bf21) 
 
 2. [a-PyTorch-Tutorial-to-Image-Captioning - GitHub](https://github.com/sgrvinod/a-PyTorch-Tutorial-to-Image-Captioning)
+
+</br>
+
+------
+## Creator:
+[<img target="_blank" src="https://media-exp1.licdn.com/dms/image/C4D03AQG-6F3HHlCTVw/profile-displayphoto-shrink_200_200/0?e=1599091200&v=beta&t=WcZLox9lzVQqIDJ2-5DsEhNFvEE1zrZcvkmcepJ9QH8" width=150>](https://skumar-djangoblog.herokuapp.com/)
