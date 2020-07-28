@@ -1,29 +1,27 @@
-# Image captioning: Implementation of **Show, Attend and Tell** paper
+# Image Caption Generation
+
+####Implementation of ***Show, Attend and Tell*** paper
 
 - [Demo](#demo)
 - [Dataset Description](#dataset-description)
 - [Input files preparation](#input-files-preparation)
-  - [1. preparation of vocabulary dictionary.](#1-preparation-of-vocabulary-dictionary)
-  - [2. Create Dataset class](#2-create-dataset-class)
-  - [3. Create Dataloader object](#3-create-dataloader-object)
-  - [4. Create Pad_collete function](#4-create-pad_collete-function)
 - [Model architecture](#model-architecture)
   - [Encoder](#encoder)
   - [Attention Layer](#attention-layer)
   - [Decoder](#decoder)
-- [Training (Fastai Implementation)](#training-fastai-implementation)
+- [Training (using Fastai)](#training-using-fastai)
   - [Fastai utilities](#fastai-utilities)
   - [Training in Stages](#training-in-stages)
   - [Model intrpretation](#model-intrpretation)
 - [Technology used](#technology-used)
-- [Credits:](#credits)
-- [Creator:](#creator)
+- [Credits](#credits)
+- [Creator](#creator)
 
 
 ## Demo
 ![](snapshots/caption_gen.gif)
 
-
+ 
 ## Dataset Description
 
 https://www.kaggle.com/ming666/flicker8k-dataset
@@ -34,27 +32,27 @@ https://www.kaggle.com/ming666/flicker8k-dataset
 
 ## Input files preparation
 
-### 1. preparation of vocabulary dictionary.
+#### 1. preparation of vocabulary dictionary.
 
 The caption labels needs to be converted into numbers as a network does not accept strings as labels. we need a look-up dictionary and store word to numeric mappings in it. 
 
 Along with it, caption lengths are also computed. Caption lengths are used for optimizing training (discussed in detail in the training part).
 
 
-### 2. Create Dataset class
+#### 2. Create Dataset class
 
 In PyTorch, for Deep learning tasks, inputs are fed in batches because of memory constraints. To facilitate this we should create a class called **Dataset** that facilitates batch creation and loading.
 
 The primary function of Dataset is stores the input paths. This class will be used by Pytorch's *DataLoader()* for loading images in batches.
 
-### 3. Create Dataloader object
+#### 3. Create Dataloader object
 
 The purpose of the **Dataloader** is to load a batch of inputs and labels pairs to be fed into the network.
 
 It is always a good idea to sort by order of captions length for faster computation. On validation set, **SortSampler** funtion from *Fastai* is used which is built on top of PyTorch's **Sampler**. On the training set, **SortishSampler** that sorts data by order of length with a bit of randomness is used. The sampler return iterator of indices.
 
 
-### 4. Create Pad_collete function
+#### 4. Create Pad_collate function
 Since the captions lengths are of different lengths, padding should be added for shorter captions to bring them to same length as PyTorch expects caption lengths to be of the same size. 
 
 Funtion collect samples and return labels tensor with padding. This funtion is passed as an argment( ```collate_fn``` ) while creating ```DataLoader``` object.
@@ -90,7 +88,7 @@ encoder output dimension = 2048
 ```
 
 
-## Training (Fastai Implementation)
+## Training (using Fastai)
 
 As we are using pre-trained weights for the encoder which has been trained on the Imagenet dataset consisting of images of 1000's of different objects, that most likely includes objects found in our dataset. Therefore, the network need not require much of tuning. On the other hand, the decoder has to learn a lot as it starts language modeling from scratch.
 
@@ -203,7 +201,7 @@ Beam Size | Test BLEU-4
 
 </br>
 
-## Credits:
+## Credits
 
 1. [Show, Attend and Tell - paper (arxiv)](https://arxiv.org/abs/1502.03044)
 
@@ -214,5 +212,5 @@ Beam Size | Test BLEU-4
 </br>
 
 ------
-## Creator:
+## Creator
 [<img target="_blank" src="https://media-exp1.licdn.com/dms/image/C4D03AQG-6F3HHlCTVw/profile-displayphoto-shrink_200_200/0?e=1599091200&v=beta&t=WcZLox9lzVQqIDJ2-5DsEhNFvEE1zrZcvkmcepJ9QH8" width=150>](https://skumar-djangoblog.herokuapp.com/)
