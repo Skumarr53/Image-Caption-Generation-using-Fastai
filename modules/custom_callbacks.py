@@ -199,9 +199,9 @@ class BleuMetric(Callback):
         
     def on_epoch_end(self, last_metrics, **kwargs):
         assert len(self.bleureferences) == len(self.bleucandidates)
-        print('\n'+' '.join([list(self.vocab.keys())[i-1] for i in self.bleucandidates[0]])+' | '+' '.join([list(self.vocab.keys())[i-1] for i in self.bleureferences[0][0]]))
-        print(' '.join([list(self.vocab.keys())[i-1] for i in self.bleucandidates[25]])+' | '+' '.join([list(self.vocab.keys())[i-1] for i in self.bleureferences[25][0]]))
-        print(' '.join([list(self.vocab.keys())[i-1] for i in self.bleucandidates[99]])+' | '+' '.join([list(self.vocab.keys())[i-1] for i in self.bleureferences[99][0]])+'\n')
+        # print('\n'+' '.join([list(self.vocab.keys())[i-1] for i in self.bleucandidates[0]])+' | '+' '.join([list(self.vocab.keys())[i-1] for i in self.bleureferences[0][0]]))
+        # print(' '.join([list(self.vocab.keys())[i-1] for i in self.bleucandidates[25]])+' | '+' '.join([list(self.vocab.keys())[i-1] for i in self.bleureferences[25][0]]))
+        # print(' '.join([list(self.vocab.keys())[i-1] for i in self.bleucandidates[99]])+' | '+' '.join([list(self.vocab.keys())[i-1] for i in self.bleureferences[99][0]])+'\n')
 
         bleu4 = corpus_bleu(self.bleureferences, self.bleucandidates)
         return add_metrics(last_metrics,bleu4)
