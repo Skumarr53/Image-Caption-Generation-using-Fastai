@@ -1,0 +1,85 @@
+attrs==19.3.0
+backcall==0.2.0
+beautifulsoup4==4.9.1
+blis==0.2.4
+Bottleneck==1.3.2
+brotlipy==0.7.0
+certifi==2020.6.20
+cffi==1.14.0
+chardet==3.0.4
+click==7.1.2
+conda==4.8.3
+conda-package-handling==1.7.0
+cryptography==2.9.2
+cycler==0.10.0
+cymem==2.0.2
+dataclasses==0.6
+decorator==4.4.2
+fastai==1.0.61
+fastprogress==0.2.2
+Flask==1.1.2
+idna @ file:///tmp/build/80754af9/idna_1593446292537/work
+importlib-metadata @ file:///tmp/build/80754af9/importlib-metadata_1593446433964/work
+ipykernel @ file:///tmp/build/80754af9/ipykernel_1596206602906/work/dist/ipykernel-5.3.4-py3-none-any.whl
+ipython @ file:///tmp/build/80754af9/ipython_1593447367857/work
+ipython-genutils==0.2.0
+itsdangerous==1.1.0
+jedi @ file:///tmp/build/80754af9/jedi_1592841914522/work
+Jinja2==2.11.2
+joblib @ file:///tmp/build/80754af9/joblib_1594236160679/work
+jsonschema==3.2.0
+jupyter-client @ file:///tmp/build/80754af9/jupyter_client_1594826976318/work
+jupyter-core==4.6.3
+kiwisolver==1.2.0
+MarkupSafe==1.1.1
+matplotlib @ file:///home/conda/feedstock_root/build_artifacts/matplotlib-base_1595353103837/work
+murmurhash==1.0.2
+nltk @ file:///tmp/build/80754af9/nltk_1592496090529/work
+numexpr==2.7.1
+numpy @ file:///tmp/build/80754af9/numpy_and_numpy_base_1596233718326/work
+olefile==0.46
+packaging==20.4
+pandas @ file:///tmp/build/80754af9/pandas_1592841660978/work
+parso==0.7.0
+pathlib2==2.3.5
+pexpect==4.8.0
+pickleshare==0.7.5
+Pillow @ file:///tmp/build/80754af9/pillow_1594307298074/work
+plac @ file:///tmp/build/80754af9/plac_1594261902054/work
+preshed==2.0.1
+prompt-toolkit==3.0.5
+protobuf==3.12.4
+ptyprocess==0.6.0
+pycosat==0.6.3
+pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
+Pygments==2.6.1
+pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1594392929924/work
+pyparsing==2.4.7
+pyrsistent==0.16.0
+PySocks==1.7.1
+python-dateutil==2.8.1
+pytz==2020.1
+PyYAML==5.3.1
+pyzmq==19.0.1
+regex @ file:///tmp/build/80754af9/regex_1593435572336/work
+requests @ file:///tmp/build/80754af9/requests_1592841827918/work
+ruamel-yaml==0.15.87
+scikit-learn @ file:///tmp/build/80754af9/scikit-learn_1592502866951/work
+scipy @ file:///tmp/build/80754af9/scipy_1592930497347/work
+six==1.15.0
+soupsieve==2.0.1
+spacy==2.1.8
+srsly==0.1.0
+tensorboardX==2.1
+thinc==7.0.8
+threadpoolctl @ file:///tmp/tmp9twdgx9k/threadpoolctl-2.1.0-py3-none-any.whl
+torch==1.4.0
+torchvision==0.5.0
+tornado==6.0.4
+tqdm @ file:///tmp/build/80754af9/tqdm_1593446365756/work
+traitlets==4.3.3
+urllib3==1.25.9
+wasabi==0.2.2
+wcwidth @ file:///tmp/build/80754af9/wcwidth_1593447189090/work
+Werkzeug==1.0.1
+zipp==3.1.0
