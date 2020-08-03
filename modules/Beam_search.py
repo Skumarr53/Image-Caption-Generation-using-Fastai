@@ -55,7 +55,7 @@ def beam_search(learn, img_path, beam_size = 5, vocab = None, transforms = None)
 
     # s is a number less than or equal to k, because sequences are removed from this process once they hit <end>
     while True:
-        
+      
         embeddings = decoder.embedding(k_prev_words).squeeze(1).float()  # (s, embed_dim)
         awe, _ = decoder.attention(encoder_out, h)  # (s, encoder_dim), (s, num_pixels)
         gate = decoder.sigmoid(decoder.f_beta(h))
