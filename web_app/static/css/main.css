@@ -28,7 +28,7 @@ input[type="file"] {
     display: inline-block;
     padding: 12px 30px;
     border-radius: .4rem;
-    background: #4439d2;
+    background: cadetblue;
     color: #fff;
     font-size: 1em;
     transition: all .4s;
@@ -37,13 +37,13 @@ input[type="file"] {
 
 .upload-label:hover{
     background: #34495E;
-    color: mediumspringgreen;
+    color: darkgray;
     font-weight: bold;
 }
 
 .loader {
     border: 8px solid #f3f3f3; /* Light grey */
-    border-top: 8px solid #3498db; /* Blue */
+    border-top: 8px solid maroon; /* Blue */
     border-radius: 50%;
     width: 50px;
     height: 50px;
