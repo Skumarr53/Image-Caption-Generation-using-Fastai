@@ -2,25 +2,32 @@
 
 #### Implementation of ***Show, Attend and Tell*** paper
 
-- [Demo](#demo)
-- [Dataset Description](#dataset-description)
-- [Input files preparation](#input-files-preparation)
-- [Model architecture](#model-architecture)
-  - [Encoder](#encoder)
-  - [Attention Layer](#attention-layer)
-  - [Decoder](#decoder)
-- [Training (using Fastai)](#training-using-fastai)
-  - [Fastai utilities](#fastai-utilities)
-  - [Training in Stages](#training-in-stages)
-  - [Model intrpretation](#model-intrpretation)
-- [Technology used](#technology-used)
-- [Credits](#credits)
-- [Creator](#creator)
+- [Image Caption Generation](#image-caption-generation)
+  - [Demo](#demo)
+  - [What's in this repo?](#whats-in-this-repo)
+  - [Dataset Description](#dataset-description)
+  - [Input files preparation](#input-files-preparation)
+  - [Model architecture](#model-architecture)
+    - [Encoder](#encoder)
+    - [Attention Layer](#attention-layer)
+    - [Decoder](#decoder)
+  - [Training (using Fastai)](#training-using-fastai)
+    - [Fastai utilities](#fastai-utilities)
+    - [Training in Stages](#training-in-stages)
+    - [Model intrpretation](#model-intrpretation)
+  - [Technology used](#technology-used)
+  - [Credits](#credits)
+  - [Creator](#creator)
 
 
 ## Demo
 ![](snapshots/caption_gen.gif)
 
+## What's in this repo?
+* [main-Finalized.ipynb](main-Finalized.ipynb) - Notebook with all the preprocessing, data prepartion, and model building training steps.
+* [modules/model.py](modules/model.py) - Pytorch implementation of model architecture.
+* [modules/custom_callbacks.py](modules/custom_callbacks.py) - Fastai Callback utilities such as Teacher forcing, gradient clipping, loss and validation metric functions. 
+* [web_app](web_app) - This directory contains model deployment setup files. 
  
 ## Dataset Description
 
