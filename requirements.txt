@@ -52,7 +52,7 @@ protobuf==3.12.4
 ptyprocess==0.6.0
 pycosat==0.6.3
 pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
-Pygments==2.6.1
+Pygments==2.7.4
 pyOpenSSL @ file:///tmp/build/80754af9/pyopenssl_1594392929924/work
 pyparsing==2.4.7
 pyrsistent==0.16.0
