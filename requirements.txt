@@ -78,7 +78,7 @@ torchvision==0.5.0
 tornado==6.0.4
 tqdm @ file:///tmp/build/80754af9/tqdm_1593446365756/work
 traitlets==4.3.3
-urllib3==1.25.9
+urllib3==1.26.5
 wasabi==0.2.2
 wcwidth @ file:///tmp/build/80754af9/wcwidth_1593447189090/work
 Werkzeug==1.0.1
