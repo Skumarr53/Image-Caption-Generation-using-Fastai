@@ -48,7 +48,7 @@ Pillow @ file:///tmp/build/80754af9/pillow_1594307298074/work
 plac @ file:///tmp/build/80754af9/plac_1594261902054/work
 preshed==2.0.1
 prompt-toolkit==3.0.5
-protobuf==3.12.4
+protobuf==3.15.0
 ptyprocess==0.6.0
 pycosat==0.6.3
 pycparser @ file:///tmp/build/80754af9/pycparser_1594388511720/work
